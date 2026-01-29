@@ -1,18 +1,31 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    
+
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <title>Neon Pixi Project</title>
-    <script type="module" crossorigin src="./assets/index-C2xWUPU3.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-BsFQKEvZ.css">
-  </head>
-  <body>
-    <div id="app"></div>
-    
-  </body>
+
+    <!-- Telegram WebApp SDK - add before other scripts -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="module" crossorigin src="./assets/index-Cwgl3X-P.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BsFQKEvZ.css">
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Telegram init for fullscreen -->
+<script>
+    // Initialize Telegram WebApp early for full expansion
+    window.Telegram?.WebApp.ready();
+    window.Telegram?.WebApp.expand();  // Full height, hides input bar
+    // Optional: Hide header for true fullscreen (if supported)
+    window.Telegram?.WebApp.MainButton?.hide();
+    window.Telegram?.WebApp.HeaderColor?.set?.('secondary_bg_color');
+</script>
+
+</body>
 </html>
