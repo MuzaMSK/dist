@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Suika Cooking Pot</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
         body {
             background: #0a0a1e;
             display: flex;
@@ -16,6 +23,10 @@
             font-family: system-ui, sans-serif;
             overflow: hidden;
             cursor: none;
+            touch-action: none;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         #game-container {
             position: relative;
@@ -29,6 +40,7 @@
             width: 100%;
             height: 100%;
             image-rendering: pixelated;
+            touch-action: none;
         }
         #loading {
             position: absolute;
@@ -62,7 +74,6 @@
         </div>
         <canvas id="game"></canvas>
     </div>
-
     <script src="wasm_exec.js"></script>
     <script>
         const loading = document.getElementById('loading');
@@ -76,7 +87,6 @@
         async function initGame() {
             try {
                 updateDebug('Step 1: Checking Go runtime...');
-                
                 if (typeof Go === 'undefined') {
                     throw new Error('wasm_exec.js not loaded - Go is undefined');
                 }
@@ -104,7 +114,6 @@
                 updateDebug('Step 5: Starting Go runtime...');
                 loading.style.display = 'none';
                 go.run(result.instance);
-                
             } catch (err) {
                 console.error('Game initialization failed:', err);
                 loading.textContent = '❌ Error: ' + err.message;
@@ -112,6 +121,17 @@
                 updateDebug('❌ ' + err.stack);
             }
         }
+        
+        // Prevent default touch behaviors
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.tagName !== 'CANVAS') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
         
         // Start initialization
         updateDebug('Initializing...');
