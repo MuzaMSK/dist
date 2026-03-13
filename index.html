@@ -1,60 +1,77 @@
-<#
-.SYNOPSIS
-    Build web game and deploy to MuzaMSK/dist for GitHub Pages
-    Usage: .\deploy-to-dist.ps1 -Message "Update v1.3"
-#>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suika Cooking Pot</title>
+    <!-- ✅ Favicon support -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a1e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, sans-serif;
+            overflow: hidden;
+            cursor: none;
+        }
+        #game-container {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 24px;
+            z-index: 10;
+            text-align: center;
+        }
+        #loading.error { color: #ff6b6b; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="loading">Loading game...<br><small style="font-size:14px;opacity:0.8">If stuck, check browser console (F12)</small></div>
+        <canvas id="game"></canvas>
+    </div>
 
-param(
-    [string]$Message = "Deploy: $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-)
-
-Write-Host "Building and deploying to MuzaMSK/dist..." -ForegroundColor Cyan
-
-# === CONFIG ===
-$SourceRoot = "$PSScriptRoot"
-$BuildFolder = "$SourceRoot/build"
-$DistRepo = "$SourceRoot/../dist"
-# ==============
-
-# 1. Build the web game
-Write-Host "Building WebAssembly..." -ForegroundColor Yellow
-& "$SourceRoot/build.ps1" -Target web
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Build failed!" -ForegroundColor Red
-    exit 1
-}
-
-# 2. Verify dist repo exists
-if (!(Test-Path $DistRepo)) {
-    Write-Host "Dist repo not found at: $DistRepo" -ForegroundColor Red
-    Write-Host "Clone it: git clone https://github.com/MuzaMSK/dist ../dist" -ForegroundColor Yellow
-    exit 1
-}
-
-# 3. Clean dist repo (preserve .git and essential files)
-Write-Host "Cleaning dist repo..." -ForegroundColor Yellow
-Get-ChildItem -Path $DistRepo -Exclude ".git", ".gitignore", "README.md", "CNAME" | 
-    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-# 4. Copy build output to dist
-Write-Host "Copying build files..." -ForegroundColor Yellow
-Copy-Item "$BuildFolder/*" -Destination $DistRepo -Recurse -Force
-
-# 5. Commit and push
-Write-Host "Pushing to GitHub..." -ForegroundColor Yellow
-Set-Location $DistRepo
-
-git add .
-git commit -m $Message
-git push origin main
-
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "Deploy successful!" -ForegroundColor Green
-    Write-Host "Live at: https://muzamsk.github.io/dist/" -ForegroundColor Cyan
-} else {
-    Write-Host "Push failed!" -ForegroundColor Red
-    exit 1
-}
-
-# Return to source
-Set-Location $SourceRoot
+    <script src="wasm_exec.js"></script>
+    <script>
+        const loading = document.getElementById('loading');
+        
+        if (typeof Go === 'undefined') {
+            loading.textContent = '❌ Error: wasm_exec.js not loaded';
+            loading.classList.add('error');
+            console.error('Go is not defined - wasm_exec.js failed to load');
+        } else {
+            const go = new Go();
+            
+            WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject)
+                .then(result => {
+                    loading.style.display = 'none';
+                    go.run(result.instance);
+                })
+                .catch(err => {
+                    loading.textContent = '❌ Error: ' + err.message;
+                    loading.classList.add('error');
+                    console.error('Failed to load game:', err);
+                });
+        }
+    </script>
+</body>
+</html>
