@@ -1,31 +1,77 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-
-    <title>Neon Pixi Project</title>
-
-    <!-- Telegram WebApp SDK - add before other scripts -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script type="module" crossorigin src="./assets/index-C1ZQRHJj.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BsFQKEvZ.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suika Cooking Pot</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a1e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, sans-serif;
+            overflow: hidden;
+            cursor: none;
+        }
+        #game-container {
+            position: relative;
+            width: 1920px;
+            height: 1080px;
+            max-width: 100vw;
+            max-height: 100vh;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 24px;
+            z-index: 10;
+            text-align: center;
+        }
+        #loading.error { color: #ff6b6b; }
+    </style>
 </head>
 <body>
-<div id="app"></div>
+    <div id="game-container">
+        <div id="loading">Loading game...<br><small style="font-size:14px;opacity:0.8">If stuck, check browser console (F12)</small></div>
+        <canvas id="game"></canvas>
+    </div>
 
-<!-- Telegram init for fullscreen -->
-<script>
-    // Initialize Telegram WebApp early for full expansion
-    window.Telegram?.WebApp.ready();
-    window.Telegram?.WebApp.expand();  // Full height, hides input bar
-    // Optional: Hide header for true fullscreen (if supported)
-    window.Telegram?.WebApp.MainButton?.hide();
-    window.Telegram?.WebApp.HeaderColor?.set?.('secondary_bg_color');
-</script>
-
+    <!-- Relative paths: Live Server serves from workspace root, we're in /web/ -->
+    <script src="wasm_exec.js"></script>
+    <script>
+        const loading = document.getElementById('loading');
+        
+        // Check if Go is defined (wasm_exec.js loaded)
+        if (typeof Go === 'undefined') {
+            loading.textContent = '❌ Error: wasm_exec.js not loaded';
+            loading.classList.add('error');
+            console.error('Go is not defined - wasm_exec.js failed to load');
+        } else {
+            const go = new Go();
+            
+            WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject)
+                .then(result => {
+                    loading.style.display = 'none';
+                    go.run(result.instance);
+                })
+                .catch(err => {
+                    loading.textContent = '❌ Error: ' + err.message;
+                    loading.classList.add('error');
+                    console.error('Failed to load game:', err);
+                });
+        }
+    </script>
 </body>
 </html>
