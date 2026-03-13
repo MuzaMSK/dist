@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Debug Load - Suika Cooking Pot</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <style>
         body {
             font-family: monospace;
@@ -35,62 +36,62 @@
                 status.innerHTML += "→ Fetching wasm_exec.js...<br>";
                 const resp = await fetch('wasm_exec.js');
                 const contentType = resp.headers.get('Content-Type');
-                status.innerHTML += `&nbsp;&nbsp;Status: <span class="${resp.ok ? 'success' : 'error'}">${resp.status}</span><br>`;
-                status.innerHTML += `&nbsp;&nbsp;Content-Type: ${contentType || 'not set'}<br>`;
+                status.innerHTML += "&nbsp;&nbsp;Status: <span class=\"" + (resp.ok ? 'success' : 'error') + "\">" + resp.status + "</span><br>";
+                status.innerHTML += "&nbsp;&nbsp;Content-Type: " + (contentType || 'not set') + "<br>";
                 
                 if (resp.ok) {
                     const code = await resp.text();
-                    status.innerHTML += `&nbsp;&nbsp;Length: ${code.length} chars<br>`;
-                    status.innerHTML += `&nbsp;&nbsp;Starts with: "${code.substring(0, 60)}..."<br>`;
+                    status.innerHTML += "&nbsp;&nbsp;Length: " + code.length + " chars<br>";
+                    status.innerHTML += "&nbsp;&nbsp;Starts with: \"" + code.substring(0, 60) + "...\"<br>";
                     
                     if (code.includes('class Go')) {
-                        status.innerHTML += `&nbsp;&nbsp;<span class="success">✓ Contains Go class definition</span><br><br>`;
+                        status.innerHTML += "&nbsp;&nbsp;<span class=\"success\">✓ Contains Go class definition</span><br><br>";
                     } else {
-                        status.innerHTML += `&nbsp;&nbsp;<span class="error">✗ Missing Go class - file may be corrupted</span><br><br>`;
+                        status.innerHTML += "&nbsp;&nbsp;<span class=\"error\">✗ Missing Go class - file may be corrupted</span><br><br>";
                     }
                 } else {
-                    status.innerHTML += `<span class="error">✗ Failed to load wasm_exec.js</span><br><br>`;
+                    status.innerHTML += "<span class=\"error\">✗ Failed to load wasm_exec.js</span><br><br>";
                 }
 
                 // Test 2: game.wasm
                 status.innerHTML += "→ Fetching game.wasm...<br>";
                 const wasmResp = await fetch('game.wasm');
                 const wasmType = wasmResp.headers.get('Content-Type');
-                status.innerHTML += `&nbsp;&nbsp;Status: <span class="${wasmResp.ok ? 'success' : 'error'}">${wasmResp.status}</span><br>`;
-                status.innerHTML += `&nbsp;&nbsp;Content-Type: ${wasmType || 'not set'}<br>`;
+                status.innerHTML += "&nbsp;&nbsp;Status: <span class=\"" + (wasmResp.ok ? 'success' : 'error') + "\">" + wasmResp.status + "</span><br>";
+                status.innerHTML += "&nbsp;&nbsp;Content-Type: " + (wasmType || 'not set') + "<br>";
                 
                 if (wasmResp.ok) {
                     const wasmBuf = await wasmResp.arrayBuffer();
                     const sizeKB = Math.round(wasmBuf.byteLength / 1024);
-                    status.innerHTML += `&nbsp;&nbsp;Size: ${sizeKB} KB<br>`;
+                    status.innerHTML += "&nbsp;&nbsp;Size: " + sizeKB + " KB<br>";
                     
                     // Check WASM magic number: \0asm
                     const bytes = new Uint8Array(wasmBuf, 0, 4);
-                    const magic = String.fromCharCode(...bytes);
+                    const magic = String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]);
                     if (magic === '\0asm') {
-                        status.innerHTML += `&nbsp;&nbsp;<span class="success">✓ Valid WASM header</span><br><br>`;
+                        status.innerHTML += "&nbsp;&nbsp;<span class=\"success\">✓ Valid WASM header</span><br><br>";
                     } else {
-                        status.innerHTML += `&nbsp;&nbsp;<span class="error">✗ Invalid WASM header: ${magic}</span><br><br>`;
+                        status.innerHTML += "&nbsp;&nbsp;<span class=\"error\">✗ Invalid WASM header: " + magic + "</span><br><br>";
                     }
                 } else {
-                    status.innerHTML += `<span class="error">✗ Failed to load game.wasm</span><br><br>`;
+                    status.innerHTML += "<span class=\"error\">✗ Failed to load game.wasm</span><br><br>";
                 }
 
                 // Test 3: assets/spoon.png
                 status.innerHTML += "→ Fetching assets/spoon.png...<br>";
                 const imgResp = await fetch('assets/spoon.png');
-                status.innerHTML += `&nbsp;&nbsp;Status: <span class="${imgResp.ok ? 'success' : 'error'}">${imgResp.status}</span><br>`;
+                status.innerHTML += "&nbsp;&nbsp;Status: <span class=\"" + (imgResp.ok ? 'success' : 'error') + "\">" + imgResp.status + "</span><br>";
                 if (imgResp.ok) {
-                    status.innerHTML += `&nbsp;&nbsp;<span class="success">✓ Asset found</span><br>`;
+                    status.innerHTML += "&nbsp;&nbsp;<span class=\"success\">✓ Asset found</span><br>";
                 } else {
-                    status.innerHTML += `&nbsp;&nbsp;<span class="warn">⚠ Asset not found - game will fail to start</span><br>`;
+                    status.innerHTML += "&nbsp;&nbsp;<span class=\"warn\">⚠ Asset not found - game will fail to start</span><br>";
                 }
 
                 // Final summary
                 status.innerHTML += "<br>✅ Diagnostic complete. Check console for details.";
                 
             } catch (e) {
-                status.innerHTML += `<br><span class="error">❌ Fatal error: ${e.message}</span>`;
+                status.innerHTML += "<br><span class=\"error\">❌ Fatal error: " + e.message + "</span>";
                 console.error('Diagnostic failed:', e);
             }
         }
