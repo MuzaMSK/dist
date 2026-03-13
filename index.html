@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suika Cooking Pot</title>
-    <!-- ✅ Favicon support -->
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -40,38 +39,83 @@
             font-size: 24px;
             z-index: 10;
             text-align: center;
+            max-width: 800px;
+            padding: 20px;
         }
         #loading.error { color: #ff6b6b; }
+        #debug-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 10px;
+            text-align: left;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
     <div id="game-container">
-        <div id="loading">Loading game...<br><small style="font-size:14px;opacity:0.8">If stuck, check browser console (F12)</small></div>
+        <div id="loading">
+            Loading game...
+            <div id="debug-info"></div>
+        </div>
         <canvas id="game"></canvas>
     </div>
 
     <script src="wasm_exec.js"></script>
     <script>
         const loading = document.getElementById('loading');
+        const debugInfo = document.getElementById('debug-info');
         
-        if (typeof Go === 'undefined') {
-            loading.textContent = '❌ Error: wasm_exec.js not loaded';
-            loading.classList.add('error');
-            console.error('Go is not defined - wasm_exec.js failed to load');
-        } else {
-            const go = new Go();
-            
-            WebAssembly.instantiateStreaming(fetch("game.wasm"), go.importObject)
-                .then(result => {
-                    loading.style.display = 'none';
-                    go.run(result.instance);
-                })
-                .catch(err => {
-                    loading.textContent = '❌ Error: ' + err.message;
-                    loading.classList.add('error');
-                    console.error('Failed to load game:', err);
-                });
+        function updateDebug(msg) {
+            debugInfo.innerHTML += msg + '<br>';
+            console.log('[Game]', msg);
         }
+        
+        async function initGame() {
+            try {
+                updateDebug('Step 1: Checking Go runtime...');
+                
+                if (typeof Go === 'undefined') {
+                    throw new Error('wasm_exec.js not loaded - Go is undefined');
+                }
+                updateDebug('✓ Go runtime found');
+                
+                updateDebug('Step 2: Fetching game.wasm...');
+                const wasmResponse = await fetch('game.wasm');
+                if (!wasmResponse.ok) {
+                    throw new Error(`game.wasm failed to load: ${wasmResponse.status} ${wasmResponse.statusText}`);
+                }
+                updateDebug(`✓ game.wasm loaded (${Math.round(wasmResponse.headers.get('Content-Length')/1024)} KB)`);
+                
+                updateDebug('Step 3: Checking Content-Type...');
+                const contentType = wasmResponse.headers.get('Content-Type');
+                updateDebug(`Content-Type: ${contentType}`);
+                if (contentType && !contentType.includes('wasm')) {
+                    updateDebug('⚠️ Warning: WASM MIME type may be incorrect');
+                }
+                
+                updateDebug('Step 4: Instantiating WebAssembly...');
+                const go = new Go();
+                const result = await WebAssembly.instantiateStreaming(wasmResponse, go.importObject);
+                updateDebug('✓ WebAssembly instantiated');
+                
+                updateDebug('Step 5: Starting Go runtime...');
+                loading.style.display = 'none';
+                go.run(result.instance);
+                
+            } catch (err) {
+                console.error('Game initialization failed:', err);
+                loading.textContent = '❌ Error: ' + err.message;
+                loading.classList.add('error');
+                updateDebug('❌ ' + err.stack);
+            }
+        }
+        
+        // Start initialization
+        updateDebug('Initializing...');
+        initGame();
     </script>
 </body>
 </html>
