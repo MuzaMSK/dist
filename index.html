@@ -8,19 +8,19 @@
       html, body {
         margin: 0; padding: 0; background: #0b1020;
         height: 100%; width: 100%; overflow: hidden;
-        /* Prevent default touch gestures on the whole page */
-        touch-action: none;
+        touch-action: none;   /* Prevents gestures on the whole page */
       }
       #app {
         width: 100vw; height: 100vh; display: block;
         touch-action: none;
       }
       canvas {
-        display: block;           /* remove any extra spacing */
-        touch-action: none;       /* essential for pointer events */
+        display: block;
+        touch-action: none;   /* 🔥 CRITICAL: must be on the canvas itself */
+        outline: none;
       }
     </style>
-    <script type="module" crossorigin src="/dist/assets/index-DeaeBtPx.js"></script>
+    <script type="module" crossorigin src="/dist/assets/index-B8hJydLs.js"></script>
     <link rel="modulepreload" crossorigin href="/dist/assets/Geometry-1h-i6xRi.js">
     <link rel="modulepreload" crossorigin href="/dist/assets/RenderTargetSystem-_khPdguf.js">
   </head>
