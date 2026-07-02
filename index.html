@@ -2,27 +2,43 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PixiJS2D - Top Down</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Vampire Survivors - PixiJS</title>
     <style>
+      * { 
+        margin: 0; 
+        padding: 0; 
+        box-sizing: border-box;
+      }
+      
       html, body {
-        margin: 0; padding: 0; background: #0b1020;
-        height: 100%; width: 100%; overflow: hidden;
-        touch-action: none;   /* Prevents gestures on the whole page */
-      }
-      #app {
-        width: 100vw; height: 100vh; display: block;
+        background: #0b1020;
+        height: 100%; 
+        width: 100%; 
+        overflow: hidden;
         touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
+      
+      #app {
+        width: 100vw; 
+        height: 100vh; 
+        display: block;
+        touch-action: none;
+        position: relative;
+      }
+      
       canvas {
         display: block;
-        touch-action: none;   /* 🔥 CRITICAL: must be on the canvas itself */
+        touch-action: none;
         outline: none;
       }
     </style>
-    <script type="module" crossorigin src="/dist/assets/index-4lD5aIa3.js"></script>
+    <script type="module" crossorigin src="/dist/assets/index-DcXJpv0M.js"></script>
     <link rel="modulepreload" crossorigin href="/dist/assets/Geometry-1h-i6xRi.js">
-    <link rel="modulepreload" crossorigin href="/dist/assets/RenderTargetSystem-_khPdguf.js">
+    <link rel="modulepreload" crossorigin href="/dist/assets/RenderTargetSystem-CS9VcyLI.js">
   </head>
   <body>
     <div id="app"></div>
