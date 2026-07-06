@@ -1,49 +1,21 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Vampire Survivors - PixiJS</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Macroquad 3D Cube Collector</title>
     <style>
-      * { 
-        margin: 0; 
-        padding: 0; 
-        box-sizing: border-box;
-      }
-      
-      html, body {
-        background: #0b1020;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
-        touch-action: none;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      /* Mobile viewport height stability (iOS Safari / dynamic toolbars) */
-      #app {
-        width: 100vw;
-        height: 100vh; /* fallback */
-        height: 100svh;
-        height: 100dvh;
-        display: block;
-        touch-action: none;
-        position: relative;
-      }
-      
-      canvas {
-        display: block;
-        touch-action: none;
-        outline: none;
-      }
+        html, body, canvas {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; position: absolute; background: black; z-index: 0;
+        }
     </style>
-    <script type="module" crossorigin src="/dist/assets/index-DRLkQQCX.js"></script>
-    <link rel="modulepreload" crossorigin href="/dist/assets/Geometry-1h-i6xRi.js">
-    <link rel="modulepreload" crossorigin href="/dist/assets/RenderTargetSystem-CS9VcyLI.js">
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
+</head>
+<body>
+    <canvas id="glcanvas" tabindex='1'></canvas>
+    <script src="https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js"></script>
+    
+    <!-- UPDATED: Look for the WASM file in the current directory -->
+    <script>load("cube_collector.wasm");</script>
+</body>
 </html>
